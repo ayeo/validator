@@ -10,6 +10,8 @@ class Validator
 
     private $errors = [];
 
+    private $inavlidFields = [];
+
     /**
      * @param ValidationRules $rules
      */
@@ -48,9 +50,15 @@ class Validator
         }
         else
         {
+            if (in_array($fieldName, $this->inavlidFields))
+            {
+                return;
+            }
+
             $validator->validate($fieldName, $object);
             if ($error = $validator->getError())
             {
+                $this->inavlidFields[] = $fieldName;
                 $errors[$fieldName] = $error;
             }
 
