@@ -1,9 +1,7 @@
 <?php
 namespace Ayeo\Validator\Constraint;
 
-use Libs\Form;
-
-class DateTimeFormat extends \Ayeo\Validator\Constraint\AbstractValidator
+class DateTimeFormat extends AbstractConstraint
 {
     /**
      * @var string
@@ -15,19 +13,14 @@ class DateTimeFormat extends \Ayeo\Validator\Constraint\AbstractValidator
         $this->format = $format;
     }
 
-    public function validate($fieldName, $form)
+    public function run($value)
     {
-        $value = $this->getFieldValue($form, $fieldName);
         \DateTime::createFromFormat($this->format, $value);
         $errors = \DateTime::getLastErrors();
 
         if (count($errors['warnings']) || count($errors['errors']))
         {
-            $this->error = $this->buildMessage($fieldName, 'must_be_datetime_format', $this->format);
-
-            return false;
+            $this->addError('must_be_datetime_format', $this->format);
         }
-
-        return true;
     }
 }

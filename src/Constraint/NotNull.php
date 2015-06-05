@@ -1,17 +1,13 @@
 <?php
 namespace Ayeo\Validator\Constraint;
 
-use Libs\Form;
-
-class NotNull extends \Ayeo\Validator\Constraint\AbstractValidator
+class NotNull extends AbstractConstraint
 {
-    public function validate($fieldName, $form)
+    public function run($value)
     {
-        $value = $this->getFieldValue($form, $fieldName);
-
         if (is_null($value))
         {
-            $this->error = $this->buildMessage($fieldName, 'must_not_be_null');
+            $this->addError('must_not_be_null');
         }
     }
 }

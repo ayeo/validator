@@ -1,6 +1,6 @@
 {
   "name": "ayeo/validator",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Universal and independent validator",
   "keywords": ["validator"],
   "type": "library",
@@ -23,6 +23,11 @@
   "autoload": {
     "psr-4": {
       "Ayeo\\Validator\\": "src//"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Ayeo\\Validator\\Tests\\": "tests//"
     }
   },
   "extra": {

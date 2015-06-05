@@ -1,36 +1,33 @@
 <?php
 namespace Ayeo\Validator\Constraint;
 
-use Libs\Form;
+use DateTime;
 
-class DateTimeHigherThan extends \Ayeo\Validator\Constraint\AbstractValidator
+class DateTimeHigherThan extends AbstractConstraint
 {
     /**
-     * @var \DateTime
+     * @var DateTime
      */
     private $dateTimeToCompare;
 
     private $format;
 
-    public function __construct(\DateTime $dateTimeToCompare)
+    public function __construct(DateTime $dateTimeToCompare, $format = 'Y-m-d')
     {
+        $this->format = $format;
         $this->dateTimeToCompare = $dateTimeToCompare;
     }
 
-    public function validate($fieldName, $form)
+    public function run($value)
     {
-        $value = $this->getFieldValue($form, $fieldName);
-
-        $validObject = ($value instanceof \DateTime);
-        $isOk = $validObject && $value->getTimestamp() > $this->dateTimeToCompare->getTimestamp();
-
-        if (!$isOk)
+        if (!$value instanceof DateTime)
         {
-            $this->error = $this->buildMessage($fieldName, 'must_be_higher_than', $this->dateTimeToCompare->format(('Y-m-d')));
-
-            return false;
+            return $this->addError('invalid_object');
         }
 
-        return true;
+        if ($value->getTimestamp() <= $this->dateTimeToCompare->getTimestamp())
+        {
+            $this->addError('must_be_higher_than', $this->dateTimeToCompare->format($this->format));
+        }
     }
 }

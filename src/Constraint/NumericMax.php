@@ -1,9 +1,7 @@
 <?php
 namespace Ayeo\Validator\Constraint;
 
-use Libs\Form;
-
-class NumericMax extends \Ayeo\Validator\Constraint\AbstractValidator
+class NumericMax extends AbstractConstraint
 {
 	/**
 	 * @var integer
@@ -13,28 +11,21 @@ class NumericMax extends \Ayeo\Validator\Constraint\AbstractValidator
 	/**
 	 * @param int $max
 	 */
-	public function __construct($max = 0) //fixme: add aditional param (more or equal?)
+	public function __construct($max = 0)
 	{
 		$this->max = $max;
 	}
 
-	/**
-	 * @param $fieldName
-	 * @param Form\AbstractForm $form
-	 * @return void
-	 */
-	public function validate($fieldName, $form)
+	public function run($value)
 	{
-        $value = $this->getFieldValue($form, $fieldName);
-
-		if (!is_numeric($value))
+		if (is_numeric($value) === false)
 		{
-			$this->error = $this->buildMessage($fieldName, 'must_be_numeric');
+			return $this->addError('must_be_numeric');
 		}
 
 		if ($value > $this->max)
 		{
-			$this->error = $this->buildMessage($fieldName, 'must_be_lower_than', $this->max);
+			return $this->addError('must_be_lower_than', $this->max);
 		}
 	}
 }

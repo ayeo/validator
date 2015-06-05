@@ -24,7 +24,7 @@ class Validator
         /* @var $validator AbstractValidator */
         foreach ($this->rules->getRules() as list($fieldName, $validator))
         {
-            $this->klops($validator, $fieldName, $object, $errors);
+            $this->processValidation($validator, $fieldName, $object, $errors);
         }
 
         $this->errors = $errors;
@@ -32,23 +32,25 @@ class Validator
         return count($errors) === 0;
     }
 
-    private function klops($validator, $fieldName, $object, &$errors)
+    private function processValidation($validator, $fieldName, $object, &$errors)
     {
         if (is_array($validator))
         {
-            $xxx = $this->getXXX($fieldName, $object);
+            $nestedObject = $this->getFieldValue($fieldName, $object);
 
             foreach ($validator as $row)
             {
                 $xValidator = $row[1];
                 $xField = $row[0];
 
-                $this->klops($xValidator, $xField, $xxx, $errors);
+                $this->processValidation($xValidator, $xField, $nestedObject, $errors);
             }
         }
         else
         {
-            $validator->validate($fieldName, $object);
+            $validator->setObject($object);
+            $validator->setFieldName($fieldName);
+            $validator->validate();
             if ($error = $validator->getError())
             {
                 $errors[$fieldName] = $error;
@@ -57,7 +59,7 @@ class Validator
         }
     }
 
-    private function getXXX($fieldName, $object)
+    private function getFieldValue($fieldName, $object)
     {
         $reflection = new \ReflectionClass(get_class($object));
 

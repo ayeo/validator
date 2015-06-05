@@ -1,25 +1,42 @@
 <?php
 namespace Ayeo\Validator\Constraint;
 
-use Libs\Form;
+use Ayeo\Validator\Exception\InvalidConstraintParameter;
 
-class ClassInstance extends \Ayeo\Validator\Constraint\AbstractValidator
+class ClassInstance extends AbstractConstraint
 {
     /**
      * @var string
      */
     private $className;
 
+    /**
+     * @param $className
+     * @throws InvalidConstraintParameter
+     */
     public function __construct($className)
     {
-        $this->className = $className;
+        if (is_string($className))
+        {
+            $this->className = $className;
+        }
+        else
+        {
+            throw new InvalidConstraintParameter();
+        }
     }
 
-    public function validate($fieldName, $form)
+    /**
+     * @param $value
+     * @return bool
+     */
+    public function run($value)
     {
-        $value = $this->getFieldValue($form, $fieldName);
         $className = $this->className;
 
-        return $value instanceof $className;
+        if (!$value instanceof $className)
+        {
+            $this->addError('invalid_object_type');
+        }
     }
 }

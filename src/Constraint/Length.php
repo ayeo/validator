@@ -1,9 +1,7 @@
 <?php
 namespace Ayeo\Validator\Constraint;
 
-use Libs\Form;
-
-class Length extends \Ayeo\Validator\Constraint\AbstractValidator
+class Length extends AbstractConstraint
 {
     /**
      * @var integer
@@ -18,14 +16,11 @@ class Length extends \Ayeo\Validator\Constraint\AbstractValidator
         $this->length = $length;
     }
 
-    public function validate($fieldName, $form)
+    public function run($value)
     {
-        $value = (string) $this->getFieldValue($form, $fieldName);
-        //var_dump($value);
-
-        if (strlen($value) !== $this->length)
+        if (mb_strlen($value) !== $this->length)
         {
-            $this->error = $this->buildMessage($fieldName, 'must_be_exactly_char_length', $this->length);
+            $this->addError('must_be_exactly_char_length', $this->length);
         }
     }
 }

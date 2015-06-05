@@ -3,7 +3,7 @@ namespace Ayeo\Validator\Constraint;
 
 use Libs\Form;
 
-class LowerThanField extends \Ayeo\Validator\Constraint\AbstractValidator
+class LowerThanField extends \Ayeo\Validator\Constraint\AbstractConstraint
 {
 	/**
 	 * @var string
@@ -18,11 +18,12 @@ class LowerThanField extends \Ayeo\Validator\Constraint\AbstractValidator
 		$this->field = $field;
 	}
 
-	public function validate($fieldName, $form)
+	public function run($value)
 	{
-		if ($form->$fieldName >= $form->{$this->field})
+        $anotherFieldValue = $this->getFieldValue($this->field);
+		if ($value >= $anotherFieldValue)
 		{
-			$this->error = $this->buildMessage($fieldName, 'must_be_lower_than_'.$this->field);
+			$this->addError('must_be_lower_than_'.$this->field);
 		}
 	}
 }

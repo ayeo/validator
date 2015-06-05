@@ -1,35 +1,42 @@
 <?php
 namespace Ayeo\Validator\Constraint;
 
-use Libs\Form;
+use Ayeo\Validator\Exception\InvalidConstraintParameter;
 
-class NumericMin extends \Ayeo\Validator\Constraint\AbstractValidator
+class NumericMin extends AbstractConstraint //todo: rename to IntegerMin
 {
 	/**
 	 * @var integer
 	 */
 	private $min;
 
-	/**
-	 * @param int $min
-	 */
+    /**
+     * @param int $min
+     * @throws InvalidConstraintParameter
+     */
 	public function __construct($min = 0)
 	{
-		$this->min = $min;
+        if (is_integer($min))
+        {
+            $this->min = $min;
+        }
+        else
+        {
+            throw new InvalidConstraintParameter;
+        }
+
 	}
 
-	public function validate($fieldName, $form)
+	public function run($value)
 	{
-        $value = $this->getFieldValue($form, $fieldName);
-
-		if (!is_numeric($value))
+		if (is_numeric($value) === false)
 		{
-			$this->error = $this->buildMessage($fieldName, 'must_be_numeric');
+			$this->addError('must_be_numeric');
 		}
 
 		if ($value < $this->min)
 		{
-			$this->error = $this->buildMessage($fieldName, 'must_be_greater_than', $this->min);
+			$this->addError('must_be_greater_than', $this->min);
 		}
 	}
 }

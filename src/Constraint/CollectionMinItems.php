@@ -1,9 +1,7 @@
 <?php
 namespace Ayeo\Validator\Constraint;
 
-use Libs\Form;
-
-class CollectionMinItems extends \Ayeo\Validator\Constraint\AbstractValidator
+class CollectionMinItems extends AbstractConstraint
 {
 	/**
 	 * @var integer
@@ -18,11 +16,11 @@ class CollectionMinItems extends \Ayeo\Validator\Constraint\AbstractValidator
 		$this->min = $min;
 	}
 
-	public function validate($fieldName, $form)
+	public function run($value)
 	{
-		if (count($form->$fieldName) < $this->min)
+		if (count($value) < $this->min)
 		{
-			$this->error = $this->buildMessage($fieldName, 'must_contain_at_least_x_items', $this->min);
+			$this->addError('must_contain_at_least_x_items', $this->min);
 		}
 	}
 }

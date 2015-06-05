@@ -1,17 +1,13 @@
 <?php
 namespace Ayeo\Validator\Constraint;
 
-use Libs\Form;
-
-class Integer extends \Ayeo\Validator\Constraint\AbstractValidator
+class Integer extends AbstractConstraint
 {
-    public function validate($fieldName, $form)
+    public function run($value)
     {
-        $value = $this->getFieldValue($form, $fieldName);
-
         if (is_integer($value) === false)
         {
-            $this->error = $this->buildMessage($fieldName, 'must_be_integer');
+            $this->addError('must_be_integer');
         }
     }
 }
