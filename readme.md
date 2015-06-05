@@ -7,7 +7,7 @@ Install
 
 Using composer
 ```
-composer require 'ayeo/validator:1.0.*@dev'
+composer require 'ayeo/validator:1.0.1'
 ```
 
 Example objects
