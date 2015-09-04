@@ -10,7 +10,7 @@ class Validator
 
     private $errors = [];
 
-    private $inavlidFields = [];
+    private $invalidFields = [];
 
     /**
      * @param ValidationRules $rules
@@ -22,6 +22,7 @@ class Validator
 
     public function validate($object)
     {
+        $this->invalidFields = []; //this fixes issue if validate twice invalid object, second try returns true
         $errors = [];
         /* @var $validator AbstractValidator */
         foreach ($this->rules->getRules() as list($fieldName, $validator))
@@ -50,7 +51,7 @@ class Validator
         }
         else
         {
-            if (in_array($fieldName, $this->inavlidFields))
+            if (in_array($fieldName, $this->invalidFields))
             {
                 return;
             }
@@ -58,10 +59,10 @@ class Validator
             $validator->setObject($object);
             $validator->setFieldName($fieldName);
             $validator->validate();
-            
+
             if ($error = $validator->getError())
             {
-                $this->inavlidFields[] = $fieldName;
+                $this->invalidFields[] = $fieldName;
                 $errors[$fieldName] = $error;
             }
 
