@@ -3,20 +3,16 @@ namespace Ayeo\Validator\Constraint;
 
 use Ayeo\Validator\Exception\InvalidConstraintParameter;
 
-class NumericMin extends AbstractConstraint //todo: rename to IntegerMin
+class NumericMin extends AbstractConstraint
 {
-	/**
-	 * @var integer
-	 */
 	private $min;
 
     /**
-     * @param int $min
      * @throws InvalidConstraintParameter
      */
 	public function __construct($min = 0)
 	{
-        if (is_integer($min))
+        if (is_numeric($min))
         {
             $this->min = $min;
         }
