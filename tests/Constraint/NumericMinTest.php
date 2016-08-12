@@ -37,9 +37,7 @@ class NumericMinTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($constraint->isValid());
     }
 
-    /**
-     * @expectedException \Ayeo\Validator\Exception\InvalidConstraintParameter
-     */
+    //should pass through
     public function testCompareEqualsFloat()
     {
         $constraint = new NumericMin(12.00000009);
