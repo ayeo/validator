@@ -100,8 +100,11 @@ class Validator
         return $value;
     }
 
-    public function getErrors()
+    public function getErrors($x = false)
     {
+        if ($x) {
+            return array_values($this->errors);
+        }
         return $this->errors;
     }
 }
