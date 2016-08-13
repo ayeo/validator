@@ -1,6 +1,8 @@
 <?php
 namespace Ayeo\Validator;
 
+use Ayeo\Validator\Constraint\AbstractConstraint;
+
 class Validator
 {
     /**
@@ -35,7 +37,7 @@ class Validator
         return count($errors) === 0;
     }
 
-    private function processValidation($validator, $fieldName, $object, &$errors)
+    private function processValidation(AbstractConstraint $validator, $fieldName, $object, &$errors)
     {
         if (is_array($validator))
         {
@@ -60,12 +62,10 @@ class Validator
             $validator->setFieldName($fieldName);
             $validator->validate();
 
-            if ($error = $validator->getError())
-            {
+            if ($validator->hasError()) {
                 $this->invalidFields[] = $fieldName;
-                $errors[$fieldName] = $error;
+                $errors[$fieldName] = $validator->getError();
             }
-
         }
     }
 
