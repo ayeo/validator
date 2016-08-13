@@ -41,10 +41,9 @@ abstract class AbstractConstraint
 		$this->fieldName = $fieldName;
 	}
 
-	//fixem!
 	protected function addError($message, $value = null)
 	{
-		$this->error = $this->buildMessage($this->fieldName, $message, $value);
+		$this->error = new Error(sprintf("%s_%s", $this->fieldName, $message), $value);
 	}
 
 	abstract public function run($value);
@@ -67,7 +66,7 @@ abstract class AbstractConstraint
 	    if ($this->hasError() === false) {
 	        throw new \LogicException("There is no error");
         }
-        
+
 		return $this->error;
 	}
 
