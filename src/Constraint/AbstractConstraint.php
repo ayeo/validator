@@ -1,6 +1,7 @@
 <?php
 namespace Ayeo\Validator\Constraint;
 
+use Ayeo\Validator\Error;
 use ReflectionClass;
 
 abstract class AbstractConstraint
@@ -56,11 +57,17 @@ abstract class AbstractConstraint
 		return !((bool)$this->error);
 	}
 
-	/**
-	 * @return string
-	 */
-	public function getError()
+	public function hasError()
+    {
+        return is_null($this->error) === false;
+    }
+
+	public function getError(): Error
 	{
+	    if ($this->hasError() === false) {
+	        throw new \LogicException("There is no error");
+        }
+        
 		return $this->error;
 	}
 
