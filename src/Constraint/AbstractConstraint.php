@@ -15,6 +15,12 @@ abstract class AbstractConstraint
 
 	protected $fieldName;
 
+	public function setDefaultValue($value)
+	{
+		if (is_null($this->object->{$this->fieldName})) {
+		    $this->object->{$this->fieldName} = $value;
+		}
+	}
 
 	final public function validate()
 	{
