@@ -18,7 +18,7 @@ class MinLength extends AbstractConstraint
 
     public function run($value)
     {
-        if (strlen($value) < $this->min)
+        if (mb_strlen($value) < $this->min)
         {
             $this->addError('must_be_longer_than', $this->min);
         }

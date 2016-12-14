@@ -8,6 +8,7 @@ class NumericMin extends AbstractConstraint
 	private $min;
 
     /**
+     * @param int|float $min
      * @throws InvalidConstraintParameter
      */
 	public function __construct($min = 0)

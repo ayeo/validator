@@ -13,7 +13,7 @@ class NumericMinTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($constraint->isValid());
     }
 
-    public function testEmptyParametr()
+    public function testEmptyParameter()
     {
         $constraint = new NumericMin();
         $constraint->run('string');
@@ -23,7 +23,7 @@ class NumericMinTest extends PHPUnit_Framework_TestCase
     /**
      * @expectedException \Ayeo\Validator\Exception\InvalidConstraintParameter
      */
-    public function testStringParametr()
+    public function testStringParameter()
     {
         $constraint = new NumericMin('string');
         $constraint->run('string');
@@ -37,11 +37,10 @@ class NumericMinTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($constraint->isValid());
     }
 
-    /**
-     * @expectedException \Ayeo\Validator\Exception\InvalidConstraintParameter
-     */
     public function testCompareEqualsFloat()
     {
         $constraint = new NumericMin(12.00000009);
+        $constraint->run(12);
+        $this->assertFalse($constraint->isValid());
     }
 }
