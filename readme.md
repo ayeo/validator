@@ -1,13 +1,13 @@
 # Validator
 
-Undependent library allows to simple validation other objects
+Independent library allows to simple validation other objects
 
 Install
 =======
 
 Using composer
 ```
-composer require 'ayeo/validator:1.0.1'
+composer require ayeo/validator
 ```
 
 Example objects
@@ -87,14 +87,15 @@ $errors = $validator->getErrors();
 Availaible constraints
 ======================
 
-- MinLength
 - Length
 - MinLength
+- MaxLength
 - Integer
 - Numeric
 - NumericMin
 - NumericMax
 - NotNull
+- NonEmpty
 - ClassInstance
 - NotClassInstance
 - LowerThanField
