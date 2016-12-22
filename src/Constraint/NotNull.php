@@ -1,7 +1,9 @@
 <?php
 namespace Ayeo\Validator\Constraint;
 
-class NotNull extends AbstractConstraint
+use Ayeo\Validator\CheckNull;
+
+class NotNull extends AbstractConstraint implements CheckNull
 {
     public function run($value)
     {

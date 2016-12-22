@@ -1,6 +1,7 @@
 <?php
 namespace Ayeo\Validator\Constraint;
 
+use Ayeo\Validator\CheckNull;
 use Ayeo\Validator\Error;
 use ReflectionClass;
 
@@ -24,8 +25,15 @@ abstract class AbstractConstraint
 
 	final public function validate()
 	{
-		//check if fieldname and object is set!
-		$this->run($this->getFieldValue());
+        $value = $this->getFieldValue();
+        if (is_null($value)) {
+            if ($this instanceof CheckNull === false) {
+                return true;
+            }
+
+        };
+
+        $this->run($value);
 
 		return (bool)$this->error;
 	}
