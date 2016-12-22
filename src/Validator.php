@@ -1,6 +1,8 @@
 <?php
 namespace Ayeo\Validator;
 
+use Ayeo\Validator\Constraint\AbstractConstraint;
+
 class Validator
 {
     /**
@@ -25,9 +27,10 @@ class Validator
         $this->invalidFields = []; //this fixes issue if validate twice invalid object, second try returns true
         $errors = [];
         /* @var $validator AbstractValidator */
-        foreach ($this->rules->getRules() as list($fieldName, $validator))
+        foreach ($this->rules->getRules() as $x => list($fieldName, $validator))
         {
-            $this->processValidation($validator, $fieldName, $object, $errors);
+            $defaultValue = $this->rules->getDefaultValue($x);
+            $this->processValidation($validator, $fieldName, $object, $errors, $defaultValue);
         }
 
         $this->errors = $errors;
@@ -35,18 +38,22 @@ class Validator
         return count($errors) === 0;
     }
 
-    private function processValidation($validator, $fieldName, $object, &$errors)
+    private function processValidation(AbstractConstraint $validator, $fieldName, $object, &$errors, $defaultValue = null)
     {
         if (is_array($validator))
         {
             $nestedObject = $this->getFieldValue($fieldName, $object);
+            if (is_null($nestedObject))
+            {
+                $nestedObject = $defaultValue;
+            }
 
             foreach ($validator as $row)
             {
                 $xValidator = $row[1];
                 $xField = $row[0];
 
-                $this->processValidation($xValidator, $xField, $nestedObject, $errors);
+                $this->processValidation($xValidator, $xField, $nestedObject, $errors, $defaultValue);
             }
         }
         else
@@ -58,14 +65,13 @@ class Validator
 
             $validator->setObject($object);
             $validator->setFieldName($fieldName);
+            $validator->setDefaultValue($defaultValue);
             $validator->validate();
 
-            if ($error = $validator->getError())
-            {
+            if ($validator->hasError()) {
                 $this->invalidFields[] = $fieldName;
-                $errors[$fieldName] = $error;
+                $errors[$fieldName] = $validator->getError();
             }
-
         }
     }
 
@@ -100,8 +106,11 @@ class Validator
         return $value;
     }
 
-    public function getErrors()
+    public function getErrors($x = false)
     {
+        if ($x) {
+            return array_values($this->errors);
+        }
         return $this->errors;
     }
 }

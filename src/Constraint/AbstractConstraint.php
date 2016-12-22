@@ -1,6 +1,8 @@
 <?php
 namespace Ayeo\Validator\Constraint;
 
+use Ayeo\Validator\CheckNull;
+use Ayeo\Validator\Error;
 use ReflectionClass;
 
 abstract class AbstractConstraint
@@ -14,11 +16,24 @@ abstract class AbstractConstraint
 
 	protected $fieldName;
 
+	public function setDefaultValue($value)
+	{
+		if (is_null($this->object->{$this->fieldName})) {
+		    $this->object->{$this->fieldName} = $value;
+		}
+	}
 
 	final public function validate()
 	{
-		//check if fieldname and object is set!
-		$this->run($this->getFieldValue());
+        $value = $this->getFieldValue();
+        if (is_null($value)) {
+            if ($this instanceof CheckNull === false) {
+                return true;
+            }
+
+        };
+
+        $this->run($value);
 
 		return (bool)$this->error;
 	}
@@ -40,10 +55,9 @@ abstract class AbstractConstraint
 		$this->fieldName = $fieldName;
 	}
 
-	//fixem!
 	protected function addError($message, $value = null)
 	{
-		$this->error = $this->buildMessage($this->fieldName, $message, $value);
+		$this->error = new Error(sprintf("%s_%s", $this->fieldName, $message), $value);
 	}
 
 	abstract public function run($value);
@@ -56,11 +70,17 @@ abstract class AbstractConstraint
 		return !((bool)$this->error);
 	}
 
-	/**
-	 * @return string
-	 */
-	public function getError()
+	public function hasError()
+    {
+        return is_null($this->error) === false;
+    }
+
+	public function getError(): Error
 	{
+	    if ($this->hasError() === false) {
+	        throw new \LogicException("There is no error");
+        }
+
 		return $this->error;
 	}
 

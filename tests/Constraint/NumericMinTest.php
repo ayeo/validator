@@ -37,6 +37,7 @@ class NumericMinTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($constraint->isValid());
     }
 
+    //should pass through
     public function testCompareEqualsFloat()
     {
         $constraint = new NumericMin(12.00000009);

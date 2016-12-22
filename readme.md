@@ -84,6 +84,28 @@ $isValid = $validator->validate($company);
 $errors = $validator->getErrors();
 ```
 
+Default values
+==============
+
+Version 1.2 introduced default values support. In order to set default value you need to pass it as third argument. Default value will be used only if field value is null. Be aware that default value as still subject of further validation - if you set invalid default value it will result with error
+```php
+use Ayeo\Validator\ValidationRules
+
+class CompanyValidationRules extends ValidationRules
+{
+    public function getRules()
+    {
+        return [['company', [['name', new MinLength(5), "Unknown name"]]];            
+    }
+}
+```
+
+Allow null
+==========
+
+By default given validator will skip checking in case of null value. Of course you need some of them to check even null value. If constraint class implements CheckNull interface validator will force check field even if it is null. At the moment only NotNull constraint it one of this kind.
+
+
 Availaible constraints
 ======================
 
