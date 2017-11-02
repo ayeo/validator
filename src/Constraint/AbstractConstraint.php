@@ -18,8 +18,9 @@ abstract class AbstractConstraint
 
 	public function setDefaultValue($value)
 	{
-		if (is_null($this->object->{$this->fieldName})) {
-		    $this->object->{$this->fieldName} = $value;
+		$value = $this->getFieldValue();
+		if (is_null($value)) {
+			$this->setFieldValue($value);
 		}
 	}
 
@@ -134,5 +135,37 @@ abstract class AbstractConstraint
 		}
 
 		return $value;
+	}
+
+	protected function setFieldValue($value)
+	{
+		$fieldName = $this->fieldName;
+		$object = $this->object;
+		$reflection = new ReflectionClass(get_class($object));
+
+		try
+		{
+			$property = $reflection->getProperty($fieldName);
+		}
+		catch (\Exception $e)
+		{
+			$property = null;
+		}
+
+
+		$methodName = 'set' . ucfirst($fieldName);
+
+		if ($property && $property->isPublic())
+		{
+			$object->{$fieldName} = $value;
+		}
+		else if ($reflection->hasMethod($methodName))
+		{
+			call_user_func(array($object, $methodName), $value);
+		}
+		else
+		{
+			throw new \Exception('Object has not property nor method: ' . $fieldName);
+		}
 	}
 }
