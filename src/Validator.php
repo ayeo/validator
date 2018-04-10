@@ -38,7 +38,7 @@ class Validator
         return count($errors) === 0;
     }
 
-    private function processValidation(AbstractConstraint $validator, $fieldName, $object, &$errors, $defaultValue = null)
+    private function processValidation($validator, $fieldName, $object, &$errors, $defaultValue = null)
     {
         if (is_array($validator))
         {
@@ -48,13 +48,9 @@ class Validator
                 $nestedObject = $defaultValue;
             }
 
-            foreach ($validator as $row)
-            {
-                $xValidator = $row[1];
-                $xField = $row[0];
-
-                $this->processValidation($xValidator, $xField, $nestedObject, $errors, $defaultValue);
-            }
+            $xValidator = $validator[1];
+            $xField = $validator[0];
+            $this->processValidation($xValidator, $xField, $nestedObject, $errors, $defaultValue);
         }
         else
         {

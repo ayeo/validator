@@ -2,9 +2,9 @@
 namespace Ayeo\Validator\Tests;
 
 use Ayeo\Validator\ArrayRules;
-use Ayeo\Validator\Constraint\CollectionMinItems;
 use Ayeo\Validator\Constraint\MinLength;
 use Ayeo\Validator\Constraint\NotNull;
+use Ayeo\Validator\Tests\Mock\Nested;
 use Ayeo\Validator\Tests\Mock\SampleClass;
 use Ayeo\Validator\Validator;
 
@@ -53,6 +53,24 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
         $rules = new ArrayRules([
             ['name', new NotNull()],
             ['name', new MinLength(10)]
+        ]);
+
+        $validator = new Validator($rules);
+        $this->assertFalse($validator->validate($sample));
+    }
+
+    public function testNestedProperties()
+    {
+        $sample = new SampleClass();
+        $sample->nested = new Nested();
+        $sample->nested->name = "short";
+
+        $rules = new ArrayRules([
+            ['nested',
+                [
+                    'name', new MinLength(10)
+                ]
+            ]
         ]);
 
         $validator = new Validator($rules);
