@@ -18,8 +18,8 @@ abstract class AbstractConstraint
 
 	public function setDefaultValue($value)
 	{
-		$value = $this->getFieldValue();
-		if (is_null($value)) {
+		$currentValue = $this->getFieldValue();
+		if (is_null($currentValue)) {
 			$this->setFieldValue($value);
 		}
 	}
