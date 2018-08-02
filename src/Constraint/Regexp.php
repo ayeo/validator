@@ -17,7 +17,8 @@ class Regexp extends AbstractConstraint
 
     public function run($value)
     {
-        if (preg_match($this->pattern, $value) === false)
+	$result = preg_match($this->pattern, $value);
+        if ($result === false || $result === 0)
         {
             $this->addError($this->errorMessage);
         }
