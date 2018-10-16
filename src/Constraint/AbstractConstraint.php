@@ -131,7 +131,7 @@ abstract class AbstractConstraint
 		}
 		else
 		{
-			throw new \Exception('Object has not property nor method: ' . $fieldName);
+			$value = null;
 		}
 
 		return $value;

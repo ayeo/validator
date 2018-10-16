@@ -1,8 +1,6 @@
 <?php
 namespace Ayeo\Validator;
 
-use Ayeo\Validator\Constraint\AbstractConstraint;
-
 class Validator
 {
     /**
@@ -35,7 +33,7 @@ class Validator
 
         $this->errors = $errors;
 
-        return count($errors) === 0;
+        return count($this->getErrors()) === 0;
     }
 
     private function processValidation($validator, $fieldName, $object, &$errors, $defaultValue = null)
@@ -52,8 +50,17 @@ class Validator
             $xField = $validator[0];
             $this->processValidation($xValidator, $xField, $nestedObject, $errors, $defaultValue);
         }
-        else
-        {
+        elseif ($validator instanceof Depend) {
+            foreach ($validator->getZbychus() as $zbychu) {
+                if ($this->getFieldValue($zbychu->getFieldName(), $object) == $zbychu->getExpectedValue()) {
+                    foreach ($zbychu->getRules() as $xxx) {
+                        foreach ($xxx as $xxField => $xxValidator) {
+                            $this->processValidation($xxValidator, $xxField, $object, $errors[$fieldName], $xxx[2] ?? null);
+                        }
+                    }
+                }
+            }
+        } else {
             if (in_array($fieldName, $this->invalidFields))
             {
                 return;
@@ -61,7 +68,7 @@ class Validator
 
             $validator->setObject($object);
             $validator->setFieldName($fieldName);
-            $validator->setDefaultValue($defaultValue);
+            //$validator->setDefaultValue($defaultValue);
             $validator->validate();
 
             if ($validator->hasError()) {
@@ -96,7 +103,8 @@ class Validator
         }
         else
         {
-            throw new \Exception('Object has not property nor method: '. $fieldName);
+            $value = null;
+            //throw new \Exception('Object has not property nor method: '. $fieldName);
         }
 
         return $value;
@@ -104,6 +112,12 @@ class Validator
 
     public function getErrors($x = false)
     {
+        foreach ($this->errors as $key => $value) {
+            if (is_null($value)) {
+                unset($this->errors[$key]);
+            }
+        }
+
         if ($x) {
             return array_values($this->errors);
         }
