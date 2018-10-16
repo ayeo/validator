@@ -6,7 +6,7 @@ class Error
     /**
      * @var string
      */
-    private $message;
+    public $message;
     /**
      * @var null
      */
