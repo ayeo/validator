@@ -52,10 +52,13 @@ class Validator
         }
         elseif ($validator instanceof Depend) {
             foreach ($validator->getZbychus() as $zbychu) {
-                if ($this->getFieldValue($zbychu->getFieldName(), $object) == $zbychu->getExpectedValue()) {
+                $a = $this->getFieldValue($zbychu->getFieldName(), $object);
+                $b = $zbychu->getExpectedValue();
+                if ($a == $b) {
                     foreach ($zbychu->getRules() as $xxx) {
                         foreach ($xxx as $xxField => $xxValidator) {
-                            $this->processValidation($xxValidator, $xxField, $object, $errors[$fieldName], $xxx[2] ?? null);
+                            $nestedObject = $this->getFieldValue($fieldName, $object);
+                            $this->processValidation($xxValidator, $xxField, (object)$nestedObject, $errors[$fieldName], $xxx[2] ?? null);
                         }
                     }
                 }
@@ -80,6 +83,10 @@ class Validator
 
     private function getFieldValue($fieldName, $object)
     {
+        if ($object instanceof \stdClass) {
+            return $object->$fieldName;
+        }
+
         $reflection = new \ReflectionClass(get_class($object));
 
         try
@@ -90,6 +97,7 @@ class Validator
         {
             $property = null;
         }
+
 
         $methodName = 'get'.ucfirst($fieldName);
 

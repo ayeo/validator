@@ -98,12 +98,17 @@ abstract class AbstractConstraint
 		return sprintf($messagePattern, $fieldName, $message, $value);
 	}
 
+	//!this is dupliaction with validator itself
 	protected function getFieldValue($fieldName = null)
 	{
 		if (is_null($fieldName))
 		{
 			$fieldName = $this->fieldName;
 		}
+
+		if ($this->object instanceof \stdClass) {
+		    return $this->object->$fieldName;
+        }
 
 		$object = $this->object;
 
