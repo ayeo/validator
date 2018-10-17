@@ -28,7 +28,7 @@ class Validator
         return count($this->getErrors()) === 0;
     }
 
-    private function processValidation($rule, string $fieldName, $object, array &$errors = [], $flag = false)
+    private function processValidation($rule, string $fieldName, $object, array &$errors = [])
     {
         if (isset($errors[$fieldName]) === false) {
             $errors[$fieldName] = [];
@@ -54,7 +54,6 @@ class Validator
             return;
         }
 
-
         if ($rule instanceof Depend) {
             foreach ($rule->getZbychus() as $zbychu) {
                 $nestedObject = (object)$this->getFieldValue($fieldName, $object);
@@ -62,12 +61,13 @@ class Validator
                 $b = $zbychu->getExpectedValue();
                 if ($a == $b) {
                     foreach ($zbychu->getRules() as $yy => $xxx) {
-                        if ($yy === '') {
-                            $this->processValidation($xxx, $fieldName, $object, $errors, true);
+                        if ($yy === '*') {
+                            foreach ($this->getObjectProperites($object) as $propertyName) {
+                                $this->processValidation($xxx, $propertyName, $nestedObject, $errors[$fieldName]);
+                            }
                         } else {
                             $this->processValidation($xxx, $yy, $nestedObject, $errors[$fieldName]);
                         }
-
                     }
                 }
             }
@@ -77,20 +77,20 @@ class Validator
                 return;
             }
 
-
             $value = $this->getFieldValue($fieldName, $object);
             $result = $validator->validate($value);
 
             if ($result === false) {
                 $this->invalidFields[] = $fieldName;
-                if ($flag) {
-                    $errors[$fieldName][''] = new Error($rule->getMessage(), $validator->getMetadata(), $rule->getCode());
-                } else {
-                    $errors[$fieldName] = new Error($rule->getMessage(), $validator->getMetadata(), $rule->getCode());
-                }
+                $errors[$fieldName] = new Error($rule->getMessage(), $validator->getMetadata(), $rule->getCode());
 
             }
         }
+    }
+
+    private function getObjectProperites(): array
+    {
+        return ['min'];
     }
 
     private function getFieldValue($fieldName, $object)
@@ -122,21 +122,21 @@ class Validator
 
     public function getErrors(): array
     {
-        return $this->clearEmpty($this->errors);
+        return $this->clearEmptyRecursively($this->errors);
     }
 
-    private function clearEmpty(array $data): array
+    private function clearEmptyRecursively(array $haystack): array
     {
-        foreach ($data as $key => $value) {
-            if (is_null($value) ) {
-                unset($data[$key]);
-            } elseif (is_array($value)) {
-                if (empty($value) === 0 || empty($this->clearEmpty($value))) {
-                    unset($data[$key]);
-                }
+        foreach ($haystack as $key => $value) {
+            if (is_array($value)) {
+                $haystack[$key] = $this->clearEmptyRecursively($haystack[$key]);
+            }
+
+            if (empty($haystack[$key])) {
+                unset($haystack[$key]);
             }
         }
 
-        return $data;
+        return $haystack;
     }
 }

@@ -17,4 +17,9 @@ abstract class AbstractConstraint
 	}
 
 	abstract public function run($value): bool;
+
+	public function getMetadata(): array
+    {
+        return [];
+    }
 }
