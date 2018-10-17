@@ -9,4 +9,9 @@ class NotNull extends AbstractConstraint implements CheckNull
     {
         return is_null($value) === false;
     }
+
+    public function getMetadata(): array
+    {
+        return [];
+    }
 }

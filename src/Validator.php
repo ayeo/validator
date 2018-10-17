@@ -28,12 +28,11 @@ class Validator
         return count($this->getErrors()) === 0;
     }
 
-    private function processValidation($rule, string $fieldName, $object, array &$errors = [])
+    private function processValidation($rule, string $fieldName, $object, array &$errors = [], $flag = false)
     {
         if (isset($errors[$fieldName]) === false) {
             $errors[$fieldName] = [];
         }
-
 
         if (is_array($rule)) {
             foreach ($rule as $xFieldName => $xRule) {
@@ -63,7 +62,12 @@ class Validator
                 $b = $zbychu->getExpectedValue();
                 if ($a == $b) {
                     foreach ($zbychu->getRules() as $yy => $xxx) {
-                        $this->processValidation($xxx, $yy, $nestedObject, $errors[$fieldName]);
+                        if ($yy === '') {
+                            $this->processValidation($xxx, $fieldName, $object, $errors, true);
+                        } else {
+                            $this->processValidation($xxx, $yy, $nestedObject, $errors[$fieldName]);
+                        }
+
                     }
                 }
             }
@@ -73,12 +77,18 @@ class Validator
                 return;
             }
 
+
             $value = $this->getFieldValue($fieldName, $object);
             $result = $validator->validate($value);
 
             if ($result === false) {
                 $this->invalidFields[] = $fieldName;
-                $errors[$fieldName] = new Error($rule->getMessage(), $validator->getMetadata(), $rule->getCode());
+                if ($flag) {
+                    $errors[$fieldName][''] = new Error($rule->getMessage(), $validator->getMetadata(), $rule->getCode());
+                } else {
+                    $errors[$fieldName] = new Error($rule->getMessage(), $validator->getMetadata(), $rule->getCode());
+                }
+
             }
         }
     }
