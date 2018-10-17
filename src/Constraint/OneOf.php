@@ -1,19 +1,24 @@
 <?php
 namespace Ayeo\Validator\Constraint;
 
-use Ayeo\Validator\CheckNull;
-
-class OneOf extends AbstractConstraint// implements CheckNull
+class OneOf extends AbstractConstraint
 {
     public function __construct(array $allowedValues)
     {
         $this->allowedValues = $allowedValues;
     }
 
-    public function run($value)
+    public function run($value): bool
     {
         if (in_array($value, $this->allowedValues) === false) {
-            $this->addError('not_allowed_value');
+            return false;
         }
+
+        return true;
+    }
+
+    public function getMetadata(): array
+    {
+        return ['allowedValues' => $this->allowedValues];
     }
 }

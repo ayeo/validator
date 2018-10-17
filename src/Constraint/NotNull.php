@@ -5,11 +5,8 @@ use Ayeo\Validator\CheckNull;
 
 class NotNull extends AbstractConstraint implements CheckNull
 {
-    public function run($value)
+    public function run($value): bool
     {
-        if (is_null($value))
-        {
-            $this->addError('must_not_be_null');
-        }
+        return is_null($value) === false;
     }
 }

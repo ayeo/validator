@@ -16,11 +16,20 @@ class MinLength extends AbstractConstraint
         $this->min = $min;
     }
 
-    public function run($value)
+    public function run($value): bool
     {
         if (mb_strlen($value) < $this->min)
         {
-            $this->addError('must_be_longer_than', $this->min);
+            return false;
         }
+
+        return true;
+    }
+
+    public function getMetadata(): array
+    {
+        return [
+            'minLength' => $this->min
+        ];
     }
 }

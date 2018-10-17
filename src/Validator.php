@@ -3,13 +3,8 @@ namespace Ayeo\Validator;
 
 class Validator
 {
-    /**
-     * @var ValidationRules
-     */
     private $rules;
-
     private $errors = [];
-
     private $invalidFields = [];
 
     /**
@@ -24,59 +19,66 @@ class Validator
     {
         $this->invalidFields = []; //this fixes issue if validate twice invalid object, second try returns true
         $errors = [];
-        /* @var $validator AbstractValidator */
-        foreach ($this->rules->getRules() as $x => list($fieldName, $validator))
-        {
-            $defaultValue = $this->rules->getDefaultValue($x);
-            $this->processValidation($validator, $fieldName, $object, $errors, $defaultValue);
+        $rules = $this->rules->getRules();
+        foreach ($rules as $fieldName => $rule) {
+            $this->processValidation($rule, $fieldName, $object, $errors);
         }
-
         $this->errors = $errors;
 
         return count($this->getErrors()) === 0;
     }
 
-    private function processValidation($validator, $fieldName, $object, &$errors, $defaultValue = null)
+    private function processValidation($rule, string $fieldName, $object, array &$errors = [])
     {
-        if (is_array($validator))
-        {
-            $nestedObject = $this->getFieldValue($fieldName, $object);
-            if (is_null($nestedObject))
-            {
-                $nestedObject = $defaultValue;
+        if (isset($errors[$fieldName]) === false) {
+            $errors[$fieldName] = [];
+        }
+
+
+        if (is_array($rule)) {
+            foreach ($rule as $xFieldName => $xRule) {
+                if (isset($errors[$fieldName]) === false) {
+                    $errors[$fieldName] = [];
+                }
+                $nestedObject = $this->getFieldValue($fieldName, $object);
+                $this->processValidation($xRule, $xFieldName, $nestedObject, $errors[$fieldName]);
             }
 
-            $xValidator = $validator[1];
-            $xField = $validator[0];
-            $this->processValidation($xValidator, $xField, $nestedObject, $errors, $defaultValue);
+            return;
         }
-        elseif ($validator instanceof Depend) {
-            foreach ($validator->getZbychus() as $zbychu) {
+
+        if ($rule instanceof MultiRule) {
+            foreach ($rule->getRules() as $xxRule) {
+                $this->processValidation($xxRule, $fieldName, $object, $errors);
+            }
+
+            return;
+        }
+
+
+        if ($rule instanceof Depend) {
+            foreach ($rule->getZbychus() as $zbychu) {
+                $nestedObject = (object)$this->getFieldValue($fieldName, $object);
                 $a = $this->getFieldValue($zbychu->getFieldName(), $object);
                 $b = $zbychu->getExpectedValue();
                 if ($a == $b) {
-                    foreach ($zbychu->getRules() as $xxx) {
-                        foreach ($xxx as $xxField => $xxValidator) {
-                            $nestedObject = $this->getFieldValue($fieldName, $object);
-                            $this->processValidation($xxValidator, $xxField, (object)$nestedObject, $errors[$fieldName], $xxx[2] ?? null);
-                        }
+                    foreach ($zbychu->getRules() as $yy => $xxx) {
+                        $this->processValidation($xxx, $yy, $nestedObject, $errors[$fieldName]);
                     }
                 }
             }
         } else {
-            if (in_array($fieldName, $this->invalidFields))
-            {
+            $validator = $rule->getConstraint();
+            if (in_array($fieldName, $this->invalidFields)) {
                 return;
             }
 
-            $validator->setObject($object);
-            $validator->setFieldName($fieldName);
-            //$validator->setDefaultValue($defaultValue);
-            $validator->validate();
+            $value = $this->getFieldValue($fieldName, $object);
+            $result = $validator->validate($value);
 
-            if ($validator->hasError()) {
+            if ($result === false) {
                 $this->invalidFields[] = $fieldName;
-                $errors[$fieldName] = $validator->getError();
+                $errors[$fieldName] = new Error($rule->getMessage(), $validator->getMetadata());
             }
         }
     }
@@ -88,47 +90,47 @@ class Validator
         }
 
         $reflection = new \ReflectionClass(get_class($object));
-
-        try
-        {
+        try {
             $property = $reflection->getProperty($fieldName);
         }
-        catch (\Exception $e)
-        {
+        catch (\Exception $e) {
             $property = null;
         }
 
-
+        $value = null;
         $methodName = 'get'.ucfirst($fieldName);
 
-        if ($property && $property->isPublic())
-        {
+        if ($property && $property->isPublic()) {
             $value = $property->getValue($object);
         }
-        else if ($reflection->hasMethod($methodName))
-        {
+        elseif ($reflection->hasMethod($methodName)) {
             $value = call_user_func(array($object, $methodName));
-        }
-        else
-        {
-            $value = null;
-            //throw new \Exception('Object has not property nor method: '. $fieldName);
         }
 
         return $value;
     }
 
-    public function getErrors($x = false)
+    public function getErrors(): array
     {
-        foreach ($this->errors as $key => $value) {
+        return $this->clearEmpty($this->errors);
+    }
+
+    private function clearEmpty(array &$data): array
+    {
+        foreach ($data as $key => $value) {
             if (is_null($value)) {
-                unset($this->errors[$key]);
+                unset($data[$key]);
+            } elseif (is_array($value)) {
+                if (count($value) === 0) {
+                    unset($data[$key]);
+                } else {
+                    if (empty($this->clearEmpty($value))) {
+                        unset($data[$key]);
+                    }
+                }
             }
         }
 
-        if ($x) {
-            return array_values($this->errors);
-        }
-        return $this->errors;
+        return $data;
     }
 }

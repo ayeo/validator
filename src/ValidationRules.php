@@ -4,7 +4,7 @@ namespace Ayeo\Validator;
 abstract class ValidationRules
 {
 	/**
-	 * @return array
+	 * @return Rule[]
 	 */
 	abstract function getRules();
 

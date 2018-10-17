@@ -3,42 +3,38 @@ namespace Ayeo\Validator;
 
 class Error
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     public $message;
-    /**
-     * @var null
-     */
-    private $value;
+    /** @var array */
+    private $metadata;
+    /** @var null|string */
+    private $code;
 
-    public function __construct(string $message, $value = null)
+    public function __construct(string $message, array $metadata, ?string $code = null)
     {
         $this->message = $message;
-        $this->value = $value;
+        $this->metadata = $metadata;
+        $this->code = $code;
     }
 
-    /**
-     * @return string
-     */
-    public function getMessage()
+    public function getMessage(): string
     {
         return $this->message;
     }
 
-    /**
-     * @return null
-     */
-    public function getValue()
-    {
-        return $this->value;
-    }
-    
-    /**
-     * @return string
-     */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->getMessage();
     }
+
+    public function getMetadata(): array
+    {
+        return $this->metadata;
+    }
+
+    public function getCode(): ?string
+    {
+        return $this->code;
+    }
 }
+
