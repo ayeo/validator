@@ -3,12 +3,13 @@ namespace Ayeo\Validator;
 
 class Error
 {
+    //fixme: use toArray instead public props
     /** @var string */
     public $message;
     /** @var array */
-    private $metadata;
+    public $metadata;
     /** @var null|string */
-    private $code;
+    public $code;
 
     public function __construct(string $message, array $metadata, ?string $code = null)
     {
@@ -22,10 +23,10 @@ class Error
         return $this->message;
     }
 
-    public function __toString(): string
-    {
-        return $this->getMessage();
-    }
+//    public function __toString(): string
+//    {
+//        return $this->getMessage();
+//    }
 
     public function getMetadata(): array
     {

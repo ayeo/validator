@@ -27,4 +27,9 @@ class Rule
     {
         return $this->message;
     }
+
+    public function getCode(): string
+    {
+        return $this->errorCode ?? '';
+    }
 }

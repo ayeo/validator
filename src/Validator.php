@@ -17,7 +17,7 @@ class Validator
 
     public function validate($object)
     {
-        $this->invalidFields = []; //this fixes issue if validate twice invalid object, second try returns true
+        //$this->invalidFields = []; //this fixes issue if validate twice invalid object, second try returns true
         $errors = [];
         $rules = $this->rules->getRules();
         foreach ($rules as $fieldName => $rule) {
@@ -78,7 +78,7 @@ class Validator
 
             if ($result === false) {
                 $this->invalidFields[] = $fieldName;
-                $errors[$fieldName] = new Error($rule->getMessage(), $validator->getMetadata());
+                $errors[$fieldName] = new Error($rule->getMessage(), $validator->getMetadata(), $rule->getCode());
             }
         }
     }
@@ -115,7 +115,7 @@ class Validator
         return $this->clearEmpty($this->errors);
     }
 
-    private function clearEmpty(array &$data): array
+    private function clearEmpty(array $data): array
     {
         foreach ($data as $key => $value) {
             if (is_null($value) ) {

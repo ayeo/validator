@@ -35,6 +35,24 @@ class NewFormatTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $errors);
     }
 
+    public function testWithCode()
+    {
+        $nameRule = new Rule(new MinLength(20), 'Name is to short', '6637');
+        $rules = ['name' => $nameRule];
+
+        $object = new SampleClass();
+        $object->name = 'Sample name';
+
+        $validator = new Validator(new ArrayRules($rules));
+        $validator->validate($object);
+        $errors = $validator->getErrors();
+
+        $expected = [
+            'name' => new Error('Name is to short', ['minLength' => 20], '6637')
+        ];
+        $this->assertEquals($expected, $errors);
+    }
+
     public function testTwoRulesToSingleField()
     {
         $nameRule1 = new Rule(new MinLength(4), 'Name is to short');
