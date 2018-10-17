@@ -118,15 +118,11 @@ class Validator
     private function clearEmpty(array &$data): array
     {
         foreach ($data as $key => $value) {
-            if (is_null($value)) {
+            if (is_null($value) ) {
                 unset($data[$key]);
             } elseif (is_array($value)) {
-                if (count($value) === 0) {
+                if (empty($value) === 0 || empty($this->clearEmpty($value))) {
                     unset($data[$key]);
-                } else {
-                    if (empty($this->clearEmpty($value))) {
-                        unset($data[$key]);
-                    }
                 }
             }
         }
