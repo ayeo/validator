@@ -11,7 +11,7 @@ class Error
     /** @var null|string */
     public $code;
 
-    public function __construct(string $message, array $metadata, ?string $code = null)
+    public function __construct(string $message, array $metadata, ?string $code = '')
     {
         $this->message = $message;
         $this->metadata = $metadata;
@@ -22,12 +22,6 @@ class Error
     {
         return $this->message;
     }
-
-//    public function __toString(): string
-//    {
-//        return $this->getMessage();
-//    }
-
     public function getMetadata(): array
     {
         return $this->metadata;

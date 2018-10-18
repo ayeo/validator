@@ -2,7 +2,7 @@
 
 namespace Ayeo\Validator;
 
-class Zbychu
+class Conditional
 {
     /** @var string */
     private $dependsOn;

@@ -7,20 +7,15 @@ class Validator
     private $errors = [];
     private $invalidFields = [];
 
-    /**
-     * @param ValidationRules $rules
-     */
-    public function __construct(ValidationRules $rules)
+    public function __construct(array $rules)
     {
         $this->rules = $rules;
     }
 
     public function validate($object)
     {
-        //$this->invalidFields = []; //this fixes issue if validate twice invalid object, second try returns true
         $errors = [];
-        $rules = $this->rules->getRules();
-        foreach ($rules as $fieldName => $rule) {
+        foreach ($this->rules as $fieldName => $rule) {
             $this->processValidation($rule, $fieldName, $object, $errors);
         }
         $this->errors = $errors;
@@ -39,38 +34,36 @@ class Validator
                 if (isset($errors[$fieldName]) === false) {
                     $errors[$fieldName] = [];
                 }
-                $nestedObject = $this->getFieldValue($fieldName, $object);
-                $this->processValidation($xRule, $xFieldName, $nestedObject, $errors[$fieldName]);
-            }
 
-            return;
-        }
-
-        if ($rule instanceof MultiRule) {
-            foreach ($rule->getRules() as $xxRule) {
-                $this->processValidation($xxRule, $fieldName, $object, $errors);
-            }
-
-            return;
-        }
-
-        if ($rule instanceof Depend) {
-            foreach ($rule->getZbychus() as $zbychu) {
-                $nestedObject = (object)$this->getFieldValue($fieldName, $object);
-                $a = $this->getFieldValue($zbychu->getFieldName(), $object);
-                $b = $zbychu->getExpectedValue();
-                if ($a == $b) {
-                    foreach ($zbychu->getRules() as $yy => $xxx) {
-                        if ($yy === '*') {
-                            foreach ($this->getObjectProperites($object) as $propertyName) {
-                                $this->processValidation($xxx, $propertyName, $nestedObject, $errors[$fieldName]);
+                if ($xRule instanceof Conditional) {
+                    $zbychu = $xRule;
+                    $nestedObject = (object)$this->getFieldValue($fieldName, $object);
+                    $a = $this->getFieldValue($zbychu->getFieldName(), $object);
+                    $b = $zbychu->getExpectedValue();
+                    if ($a == $b) {
+                        foreach ($zbychu->getRules() as $yy => $xxx) {
+                            if ($yy === '*') {
+                                foreach ($this->getObjectProperites($object) as $propertyName) {
+                                    $this->processValidation($xxx, $propertyName, $nestedObject, $errors[$fieldName]);
+                                }
+                            } else {
+                                $this->processValidation($xxx, $yy, $nestedObject, $errors[$fieldName]);
                             }
-                        } else {
-                            $this->processValidation($xxx, $yy, $nestedObject, $errors[$fieldName]);
                         }
+                    }
+                } else {
+                    if (is_numeric($xFieldName)) {
+                        $xFieldName = $fieldName;
+                        $nestedObject = $object;
+                        $this->processValidation($xRule, $xFieldName, $nestedObject, $errors);
+                    } else {
+                        $nestedObject = $this->getFieldValue($fieldName, $object);
+                        $this->processValidation($xRule, $xFieldName, $nestedObject, $errors[$fieldName]);
                     }
                 }
             }
+
+            return;
         } else {
             $validator = $rule->getConstraint();
             if (in_array($fieldName, $this->invalidFields)) {
