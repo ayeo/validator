@@ -1,7 +1,9 @@
 <?php
+
 namespace Ayeo\Validator;
 
 use Ayeo\Validator\Constraint\AbstractConstraint;
+use RuntimeException;
 
 class Validator
 {
@@ -26,7 +28,6 @@ class Validator
     {
         $this->invalidFields = []; //this fixes issue if validate twice invalid object, second try returns true
         $errors = [];
-        /* @var $validator AbstractValidator */
         foreach ($this->rules->getRules() as $x => $y)
         {
             list($fieldName, $validator) = $y;
@@ -55,6 +56,10 @@ class Validator
         }
         else
         {
+            if ($validator instanceof AbstractConstraint === false) {
+                throw new RuntimeException('Invalid constraint class. Constraint must extends AbstractConstraint');
+            }
+
             if (in_array($fieldName, $this->invalidFields))
             {
                 return;

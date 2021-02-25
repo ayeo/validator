@@ -7,6 +7,7 @@ use Ayeo\Validator\Constraint\NotNull;
 use Ayeo\Validator\Tests\Mock\Nested;
 use Ayeo\Validator\Tests\Mock\SampleClass;
 use Ayeo\Validator\Validator;
+use RuntimeException;
 
 class ValidatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -14,7 +15,7 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $sample = new SampleClass();
         $rules = new ArrayRules([
-            ['name', new NotNull()] //, new MinLength(10)
+            ['name', new NotNull()]
         ]);
 
         $validator = new Validator($rules);
@@ -75,5 +76,19 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
 
         $validator = new Validator($rules);
         $this->assertFalse($validator->validate($sample));
+    }
+
+    /**
+     * @expectedException RuntimeException
+     */
+    public function testUsingInvalidClassAsConstraint()
+    {
+
+        $sample = new SampleClass();
+        $rules = new ArrayRules([['name', new SampleClass()]]);
+
+        $validator = new Validator($rules);
+        $result = $validator->validate($sample);
+        $this->assertFalse($result);
     }
 }
