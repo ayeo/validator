@@ -76,7 +76,7 @@ abstract class AbstractConstraint
         return is_null($this->error) === false;
     }
 
-	public function getError(): Error
+	public function getError()
 	{
 	    if ($this->hasError() === false) {
 	        throw new \LogicException("There is no error");

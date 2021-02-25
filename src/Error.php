@@ -12,7 +12,7 @@ class Error
      */
     private $value;
 
-    public function __construct(string $message, $value = null)
+    public function __construct($message, $value = null)
     {
         $this->message = $message;
         $this->value = $value;

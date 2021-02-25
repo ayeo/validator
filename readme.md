@@ -108,7 +108,7 @@ By default given validator will skip checking in case of null value. Of course y
 
 Availaible constraints
 ======================
-
+ 
 - Length
 - MinLength
 - MaxLength
@@ -118,8 +118,12 @@ Availaible constraints
 - NumericMax
 - NotNull
 - NonEmpty
+- ArrayOfType
+- IsArray
 - ClassInstance
 - NotClassInstance
 - LowerThanField
+- NoWhitespace
+- Email
 
 Feel free to add some more!

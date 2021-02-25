@@ -8,7 +8,7 @@ abstract class ValidationRules
 	 */
 	abstract function getRules();
 
-    public function getDefaultValue(string $key)
+    public function getDefaultValue($key)
     {
         $rules = $this->getRules();
         if (isset($rules[$key][2]))
